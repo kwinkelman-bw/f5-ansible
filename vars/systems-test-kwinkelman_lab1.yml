@@ -1,0 +1,47 @@
+---
+bigip:
+  - {name: lb-01a.lab1.bwnet.us,
+     server: 192.168.111.246}
+  - {name: lb-01b.lab1.bwnet.us,
+     server: 192.168.111.247}
+bigip_vlan_name: lab1-dc-sec-app1
+bigip_vlan_id: 330
+bigip_float_self_ip: 192.168.114.62
+bigip_float_traffic_group: traffic-group-1
+bigip_vs:
+  - name: evs-aliback_vs
+    destination: 192.168.114.59
+    port: 80
+    # protocol: tcp
+    pool: evs-aliback_pool
+    profiles:
+      - http
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: systems-test-kwinkelman-01_pool
+    members: "{{ bigip_node }}"
+    monitors:
+      - http
+    lb_method: fastest-app-response
+bigip_node:
+  - name: systems-test-kwinkelman-01a.lab1
+    address: 192.168.113.232
+  - name: systems-test-kwinkelman-01b.lab1
+    address: 192.168.113.231
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 80
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 80
+bigip_ldap_monitor:
+  - name: irisqa-ldap-01_ldap
+    base: "ou=People,dc,lab1,dc=bandwidthclec,dc=local"
+    chase_referrals: no
+    filter: "uid=systemUser"
+    mandatory_attributes: no
+    security: "none"
+    target_password: ""
+    target_username: ""

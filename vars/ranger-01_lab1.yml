@@ -1,0 +1,37 @@
+---
+bigip:
+  - {name: lb-01a.lab1,
+     server: 192.168.111.246
+     }
+  - {name: lb-01b.lab1,
+     server: 192.168.111.247
+     }
+bigip_vs:
+  - name: ranger-01.bwnet.us_http_vs
+    destination: 192.168.112.68
+    port: 80
+    # protocol: tcp
+    pool: ranger-01.bwnet.us_http_pool
+    profiles:
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: ranger-01.bwnet.us_http_pool
+    members: "{{ bigip_node }}"
+    monitors:
+      - ranger-01.bwnet.us_http_monitor
+bigip_node:
+  - name: hdp-master-01a.lab1
+    address: 192.168.112.178
+  - name: hdp-master-01e.lab1
+    address: 192.168.112.182
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 6080
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 6080
+bigip_http_monitor:
+  - name: ranger-01.bwnet.us_http_pool
+    port: 6080

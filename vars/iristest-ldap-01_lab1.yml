@@ -1,0 +1,43 @@
+---
+bigip:
+  - {name: lb-01a.lab1,
+     server: 192.168.111.246
+     }
+  - {name: lb-01b.lab1,
+     server: 192.168.111.247
+     }
+bigip_vs:
+  - name: iristest-ldap-01.bandwidthclec.com_ldap_vs
+    destination: 192.168.114.51
+    port: 389
+    # protocol: tcp
+    pool: iristest-ldap-01.bandwidthclec.com_ldap_pool
+    profiles:
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: iristest-ldap-01.bandwidthclec.com_ldap_pool
+    members: "{{ bigip_node }}"
+    monitors:
+      - iristest-ldap-01_ldap_monitor
+bigip_node:
+  - name: iristest-ldap-01a.lab1
+    address: 192.168.101.50
+  - name: iristest-ldap-01b.lab1
+    address: 192.168.101.51
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 389
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 389
+bigip_ldap_monitor:
+  - name: iristest-ldap-01_ldap_monitor
+    base: "cn=config"
+    chase_referrals: no
+    filter: "cn=SNMP"
+    mandatory_attributes: no
+    security: "none"
+    target_password: ""
+    target_username: ""

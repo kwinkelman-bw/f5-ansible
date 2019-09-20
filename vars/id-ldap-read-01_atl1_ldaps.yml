@@ -1,0 +1,37 @@
+---
+env_name: id-ldap-read-01.atl1
+bigip_node:
+  - name: id-ldap-01c.atl1
+    address: "{{ lookup('dig', 'id-ldap-01c.atl1.bwnet.us') }}"
+  - name: id-ldap-01d.atl1
+    address: "{{ lookup('dig', 'id-ldap-01d.atl1.bwnet.us') }}"
+bigip_vs:
+  - name: "{{ env_name }}.bwnet.us_ldaps_vs"
+    destination: "{{ lookup('dig', 'id-ldap-read-01.atl1.bwnet.us') }}"
+    port: 636
+    pool: "{{ env_name }}.bwnet.us_ldaps_pool"
+    profiles:
+      - tcp
+    snat: automap
+
+bigip_pool:
+  - name: "{{ env_name }}.bwnet.us_ldaps_pool"
+    members: "{{ bigip_node }}"
+    monitors:
+      - "{{ env_name }}_ldaps_monitor"
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 636
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 636
+bigip_ldap_monitor:
+  - name: "{{ env_name }}_ldaps_monitor"
+    base: "cn=config"
+    chase_referrals: no
+    filter: "cn=SNMP"
+    mandatory_attributes: no
+    security: "ssl"
+    target_password: ""
+    target_username: ""

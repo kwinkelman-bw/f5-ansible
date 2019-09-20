@@ -1,0 +1,42 @@
+---
+#bigip:
+#  - {name: lb-01a.lab1,
+#     server: 192.168.111.246
+#     }
+#  - {name: lb-01b.lab1,
+#     server: 192.168.111.247
+#     }
+bigip_vs:
+  - name: id-ldap-uat-read-01.atl1.bwnet.us_ldap_vs
+    destination: 192.168.136.203
+    port: 389
+    pool: id-ldap-uat-read-01.atl1.bwnet.us_ldap_pool
+    profiles:
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: id-ldap-uat-read-01.atl1.bwnet.us_ldap_pool
+    members: "{{ bigip_node }}"
+    monitors:
+      - id-ldap-uat-read-01_ldap_monitor
+bigip_node:
+  - name: id-ldap-uat-01c.atl1
+    address: 192.168.136.31
+  - name: id-ldap-uat-01d.atl1
+    address: 192.168.136.32
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 389
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 389
+bigip_ldap_monitor:
+  - name: id-ldap-uat-read-01_ldap_monitor
+    base: "cn=config"
+    chase_referrals: no
+    filter: "cn=SNMP"
+    mandatory_attributes: no
+    security: "none"
+    target_password: ""
+    target_username: ""

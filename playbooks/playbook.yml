@@ -1,0 +1,86 @@
+---
+- hosts: all
+  gather_facts: false
+
+  roles:
+    - role: f5devcentral.f5ansible
+
+  vars:
+    f5provider: &f5provider
+      provider:
+        server: "{{ inventory_hostname }}"
+        user: admin
+        password: "{{ f5_password }}"
+#        validate_certs: false
+
+  vars_prompt:
+  - name: "f5_password"
+    prompt: "f5 admin user password"
+
+  tasks:
+
+    - name: Create ldap health check
+      bigip_monitor_ldap:
+        base: "{{ item.base }}"
+        chase_referrals: "{{ item.chase_referrals }}"
+        filter: "{{ item.filter }}"
+        mandatory_attributes: "{{ item.mandatory_attributes }}"
+        name: "{{ item.name }}"
+        security: "{{ item.security }}"
+        target_password: "{{ item.target_password }}"
+        target_username: "{{ item.target_username }}"
+        <<: *f5provider
+      loop: "{{ bigip_ldap_monitor }}"
+      when: bigip_ldap_monitor is defined
+      delegate_to: localhost
+      tags: bigip_monitor_ldap
+
+    - name: Create nodes
+      bigip_node:
+        name: "{{ item.name }}"
+        address: "{{ item.address }}"
+        <<: *f5provider
+      loop: "{{ bigip_node }}"
+      delegate_to: localhost
+      tags: bigip_node
+
+    - name: Create pool
+      bigip_pool:
+        name: "{{ item.name }}"
+        monitors: "{{ item.monitors | default('tcp') }}"
+        lb_method: "{{ item.lb_method | default('round-robin') }}"
+        <<: *f5provider
+      loop: "{{ bigip_pool }}"
+      delegate_to: localhost
+      tags: bigip_pool
+
+    - name: Populate pool with members
+      bigip_pool_member:
+        pool: "{{ bigip_pool[0].name }}"
+        address: "{{ item.address }}"
+        port: "{{ item.port }}"
+        name: "{{ item.name }}"
+        <<: *f5provider
+      loop: "{{ bigip_service }}"
+      delegate_to: localhost
+      tags: bigip_pool_member
+
+    - name: Create virtual server
+      bigip_virtual_server:
+        name: "{{ item.name }}"
+        destination: "{{ item.destination }}"
+        port: "{{ item.port }}"
+        pool: "{{ item.pool }}"
+        profiles: "{{ item.profiles }}"
+        snat: "{{ item.snat }}"
+        <<: *f5provider
+      loop: "{{ bigip_vs }}"
+      delegate_to: localhost
+      tags: bigip_virtual_server
+
+    - name: Save the running configuration of the BIG-IP
+      bigip_config:
+        save: true
+        <<: *f5provider
+      delegate_to: localhost
+      tags: bigip_config

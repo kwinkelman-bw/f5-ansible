@@ -1,0 +1,45 @@
+---
+bigip:
+  - {name: lb-01a.lab1,
+     server: 192.168.111.246,
+     self_ip: 192.168.114.60,
+     self_netmask: 255.255.255.192,
+     tagged_interfaces: 2.1}
+  - {name: lb-01b.lab1,
+     server: 192.168.111.247,
+     self_ip: 192.168.114.61,
+     self_netmask: 255.255.255.192,
+     tagged_interfaces: 2.1}
+bigip_vlan_name: lab1-dc-sec-app1
+bigip_vlan_id: 330
+bigip_float_self_ip: 192.168.114.62
+bigip_float_traffic_group: traffic-group-1
+bigip_vs:
+  - name: evs-aliback_vs
+    destination: 192.168.114.59
+    port: 80
+    # protocol: tcp
+    pool: evs-aliback_pool
+    profiles:
+      - http
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: evs-aliback_pool
+    members: "{{ bigip_node }}"
+    monitors:
+      - http_evs_aliback
+      - tcp
+    lb_method: fastest-app-response
+bigip_node:
+  - name: evs-ali-back-01.lab1
+    address: 192.168.107.4
+  - name: evs-ali-back-02.lab1
+    address: 192.168.107.5
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 8100
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 8100

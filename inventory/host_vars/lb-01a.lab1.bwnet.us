@@ -1,0 +1,9 @@
+---
+tagged_interfaces: 2.1
+self_ip:
+  - {ip: 192.168.114.60,
+     netmask: 255.255.255.192,
+     traffic_group: traffic-group-local-only}
+  - {ip: 192.168.114.62,
+     netmask: 255.255.255.192,
+     traffic_group: traffic-group-1}
