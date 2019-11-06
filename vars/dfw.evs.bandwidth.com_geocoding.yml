@@ -1,0 +1,31 @@
+---
+env_name: dfw.evs
+bigip_node:
+  - name: evs-api-01.dfw1
+    address: "{{ lookup('dig', 'evs-api-01.dfw1.bwnet.us') }}"
+  - name: evs-api-02.dfw1
+    address: "{{ lookup('dig', 'evs-api-02.dfw1.bwnet.us') }}"
+bigip_vs:
+  - name: "{{ env_name }}.bandwidth.com_geocoding_vs"
+    destination: "{{ lookup('dig', 'dfw.evs.bandwidth.com') }}"
+    port: 8040
+    pool: "{{ env_name }}.bandwidth.com_geocoding_pool"
+    profiles:
+      - tcp
+    snat: automap
+bigip_pool:
+  - name: "{{ env_name }}.bandwidth.com_geocoding_pool"
+    members: "{{ bigip_node }}"
+    monitors:
+      - "{{ env_name }}.bandwidth.com_geocoding_monitor"
+bigip_service:
+  - name: "{{ bigip_node[0].name }}"
+    address: "{{ bigip_node[0].address }}"
+    port: 8040
+  - name: "{{ bigip_node[1].name }}"
+    address: "{{ bigip_node[1].address }}"
+    port: 8040
+bigip_http_monitor:
+  - name: "{{ env_name }}.bandwidth.com_geocoding_monitor"
+    send: "GET /geocoding-api/healthcheck\r\n"
+    port: 8040
