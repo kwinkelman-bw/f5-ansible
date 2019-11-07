@@ -70,7 +70,7 @@
         port: "{{ item.port }}"
         name: "{{ item.name }}"
         <<: *f5provider
-      loop: "{{ bigip_service }}"
+      loop: "{{ bigip_node }}"
       delegate_to: localhost
       tags: bigip_pool_member
 
