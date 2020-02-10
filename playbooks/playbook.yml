@@ -13,8 +13,8 @@
 #        validate_certs: false
 
   vars_prompt:
-  - name: "f5_password"
-    prompt: "f5 admin user password"
+#  - name: "f5_password"
+#    prompt: "f5 admin user password"
 
   tasks:
 
