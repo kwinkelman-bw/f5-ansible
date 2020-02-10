@@ -52,6 +52,18 @@
       delegate_to: localhost
       tags: bigip_monitor_http
 
+    - name: Create data group lists
+      bigip_data_group:
+        name: "{{ item.name }}"
+        internal: "{{ item.internal }}"
+        records: "{{ item.records_content }}"
+        type: "{{ item.type }}"
+        <<: *f5provider
+      loop: "{{ bigip_data_group }}"
+      when: bigip_data_group is defined
+      delegate_to: localhost
+      tags: bigip_data_group
+
     - name: Create nodes
       bigip_node:
         name: "{{ item.name }}"
