@@ -52,6 +52,17 @@
       delegate_to: localhost
       tags: bigip_monitor_http
 
+    - name: Create irules
+      bigip_irule:
+          module: ltm
+          src: "../files/{{ item.name }}.irule"
+          name: "{{ item.name }}"
+          <<: *f5provider
+      loop: "{{ bigip_irule }}"
+      when: bigip_irule is defined
+      delegate_to: localhost
+      tags: bigip_irule
+
     - name: Create data group lists
       bigip_data_group:
         name: "{{ item.name }}"
