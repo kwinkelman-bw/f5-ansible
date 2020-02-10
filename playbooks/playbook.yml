@@ -10,7 +10,6 @@
       provider:
         server: "{{ inventory_hostname }}"
         user: admin
-#        validate_certs: false
 
   vars_prompt:
 #  - name: "f5_password"
