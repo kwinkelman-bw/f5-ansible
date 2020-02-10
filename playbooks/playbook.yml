@@ -47,6 +47,8 @@
       bigip_monitor_http:
         name: "{{ item.name }}"
         description: "{{ item.description | default() }}"
+        send: "{{ item.send | default('GET /\\r\\n') }}" # This is terrible, I would like to let the f5 populate the "default"
+        receive: "{{ item.receive | default() }}"
         <<: *f5provider
       loop: "{{ bigip_http_monitor }}"
       when: bigip_http_monitor is defined
