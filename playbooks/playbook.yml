@@ -89,6 +89,7 @@
         port: "{{ item.port }}"
         pool: "{{ item.pool }}"
         profiles: "{{ item.profiles }}"
+        default_persistence_profile: "{{ item.default_persistence_profile | default('') }}"
         snat: "{{ item.snat }}"
         <<: *f5provider
       loop: "{{ bigip_vs }}"
