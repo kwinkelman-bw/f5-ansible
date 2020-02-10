@@ -58,6 +58,7 @@
         address: "{{ item.address }}"
         <<: *f5provider
       loop: "{{ bigip_node }}"
+      when: bigip_node is defined
       delegate_to: localhost
       tags: bigip_node
 
@@ -68,6 +69,7 @@
         lb_method: "{{ item.lb_method | default('round-robin') }}"
         <<: *f5provider
       loop: "{{ bigip_pool }}"
+      when: bigip_pool is defined
       delegate_to: localhost
       tags: bigip_pool
 
@@ -79,6 +81,7 @@
         name: "{{ item.name }}"
         <<: *f5provider
       loop: "{{ bigip_node }}"
+      when: bigip_pool is defined
       delegate_to: localhost
       tags: bigip_pool_member
 
@@ -94,6 +97,7 @@
         snat: "{{ item.snat }}"
         <<: *f5provider
       loop: "{{ bigip_vs }}"
+      when: bigip_virtual_server is defined
       delegate_to: localhost
       tags: bigip_virtual_server
 
