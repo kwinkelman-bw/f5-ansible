@@ -46,6 +46,7 @@
     - name: Create http health check
       bigip_monitor_http:
         name: "{{ item.name }}"
+        description: "{{ item.description | default() }}"
         <<: *f5provider
       loop: "{{ bigip_http_monitor }}"
       when: bigip_http_monitor is defined
