@@ -123,7 +123,7 @@
         snat: "{{ item.snat }}"
         <<: *f5provider
       loop: "{{ bigip_vs }}"
-      when: bigip_virtual_server is defined
+      when: bigip_vs is defined
       delegate_to: localhost
       tags: bigip_virtual_server
 
