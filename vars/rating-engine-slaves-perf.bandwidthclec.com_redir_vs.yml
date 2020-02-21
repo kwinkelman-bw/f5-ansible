@@ -1,0 +1,12 @@
+---
+env_name: rating-engine-slaves-perf.lab1.bwnet.us
+
+bigip_vs:
+  - name: "{{ env_name }}_redir_vs"
+    destination: "{{ lookup('dig', 'rating-engine-slaves-perf.lab1.bwnet.us') }}"
+    port: 80
+    profiles:
+      - tcp
+      - http
+    irules:
+      - _sys_https_redirect

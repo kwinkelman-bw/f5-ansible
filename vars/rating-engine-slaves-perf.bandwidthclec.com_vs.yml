@@ -1,0 +1,36 @@
+---
+env_name: rating-engine-slaves-perf.lab1.bwnet.us
+bigip_node:
+  - name: mm-rating-slave-01a.lab1
+    address: "{{ lookup('dig', 'mm-rating-slave-01a.lab1.bwnet.us') }}"
+    port: 8080
+  - name: mm-rating-slave-01b.lab1
+    address: "{{ lookup('dig', 'mm-rating-slave-01b.lab1.bwnet.us') }}"
+    port: 8080
+  - name: mm-rating-slave-01c.lab1
+    address: "{{ lookup('dig', 'mm-rating-slave-01c.lab1.bwnet.us') }}"
+    port: 8080
+
+bigip_vs:
+  - name: "{{ env_name }}_vs"
+    destination: "{{ lookup('dig', 'rating-engine-slaves-perf.lab1.bwnet.us') }}"
+    port: 443
+    pool: "{{ env_name }}_pool"
+    profiles:
+      - tcp
+      - http
+      - rating-engine-slaves-perf.lab1.bwnet.us
+    irules:
+      - log_web_ssl
+    snat: automap
+
+bigip_pool:
+  - name: "{{ env_name }}_pool"
+    members: "{{ bigip_node }}"
+    monitors:
+      - "{{ env_name }}_http_mon"
+
+bigip_http_monitor:
+  - name: "{{ env_name }}_http_mon"
+    send: "GET /stats HTTP/1.1\\r\\nConnection: Close\\r\\nHost: rating-engine-slaves-perf.lab1.bwnet.us\\r\\n"
+    receive: "200"
