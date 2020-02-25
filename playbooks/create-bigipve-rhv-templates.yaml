@@ -1,0 +1,23 @@
+---
+
+- name: Create a BIGIP template
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    engine_fqdn: rhevm.lab1.bandwidthclec.local
+    engine_user: admin@internal
+    engine_password: yxXAZrxz0XwbY81vUlzP8rk8
+    engine_cafile: rhevm.lab1.crt
+
+    qcow_url: http://f5images.rdu1.bwnet.us/BIGIP-13.1.3.1-0.0.4.qcow2
+    template_cluster: LabRDU
+    template_name: BIGIP-13.1-test
+    template_memory: 4GiB
+    template_cpu: 2
+#    template_disk_size: 10GiB
+    template_disk_storage: rhev01a
+
+  roles:
+    - ovirt.image-template

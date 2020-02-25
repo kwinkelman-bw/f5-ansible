@@ -1,0 +1,4 @@
+---
+- name: ovirt.image-template
+  src: https://github.com/oVirt/ovirt-ansible-image-template
+  version: 1.2.1
